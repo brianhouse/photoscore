@@ -12,13 +12,31 @@ colors = [  (0, 0, 1),
             (1, 1, 0)
             ]
 
+class Note():
+
+    def __init__(self, on, y, quality):
+        self.on = on
+        self.off = on + (5 / ctx.width)
+        self.quality = quality
+        self.velocity = 1.0
+        self.y = y        
+
+    def update(self, x):
+        if x > self.off:
+            self.off = x
+
+    def hit(self, note):
+        return util.distance((x * ctx.width, y * ctx.height), (self.on * ctx.width, self.y * ctx.height)) < 3
+
+
 notes = []
+current_note = None
 
 quality = "1"
 
 
 ctx = animation.Context(600, 800, background=(1., 1., 1., 1.), fullscreen=False, title="score")    
-ctx.load_image("IMG_6701.jpg", 600, 800)
+ctx.load_image("IMG_6701.jpg", 0, 0, 600, 800)
 
 def on_key_press(info):
     global quality
@@ -29,29 +47,37 @@ def on_key_press(info):
 ctx.add_callback("key_press", on_key_press)
 
 def on_mouse_press(info):
-    global notes
+    global notes, current_note
     x, y, button, modifiers = info
     if modifiers == 1:
         for note in notes:
-            x2, y2, q2 = note
-            if util.distance((x * ctx.width, y * ctx.height), (x2 * ctx.width, y2 * ctx.height)) < 3:
+            if note.hit(x, y):
                 try:
                     notes.remove(note)
-                    log.info("Remove %f,%f %s" % note)
+                    log.info("Removed note")
                 except ValueError:
                     pass
     else:
-        notes.append((x, y, quality))
-        log.info("Add %f,%f %s" % (x, y, quality))
+        note = Note(x, y, quality)
+        notes.append(note)
+        current_note = note
+        log.info("Add note %f,%f" % (x, y))
 ctx.add_callback("mouse_press", on_mouse_press)
+
+def on_mouse_drag(info):
+    global current_note
+    x, y, dx, dy, button, modifiers = info
+    current_note.update(x)
+ctx.add_callback("mouse_drag", on_mouse_drag)
 
 def draw():
     global notes, quality
     for note in notes:
-        x, y, q = note
+        x1, x2, y, q = note.on, note.off, note.y, note.quality
+        width = x2 - x1
         intensity = 1.0
         color = list(colors[characters.index(q) % len(colors)])
         color.append(intensity)
-        ctx.rect(x - (3 / ctx.width), y - (3 / ctx.height), 7 / ctx.width, 7 / ctx.height, (1., 1., 1., 1.))
-        ctx.rect(x - (2 / ctx.width), y - (2 / ctx.height), 5 / ctx.width, 5 / ctx.height, color)            
+        ctx.rect(x1 - (3 / ctx.width), y - (3 / ctx.height), width + (2 / ctx.width), 7 / ctx.height, (1., 1., 1., 1.))
+        ctx.rect(x1 - (2 / ctx.width), y - (2 / ctx.height), width, 5 / ctx.height, color)            
 ctx.start(draw)
