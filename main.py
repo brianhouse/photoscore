@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
+import sys
+from PIL import Image
 from housepy import animation, config, log, util
 from random import random
+
+HEIGHT = 700
 
 characters = "1234567890qwertyuiopasdfghjklzxcvbnm"
 colors = [  (0, 0, 1),
@@ -34,9 +38,17 @@ current_note = None
 
 quality = "1"
 
+if len(sys.argv) < 2:
+    print("[IMAGE FILENAME]")
+    exit()
+filename = sys.argv[1]
 
-ctx = animation.Context(600, 800, background=(1., 1., 1., 1.), fullscreen=False, title="score")    
-ctx.load_image("IMG_6701.jpg", 0, 0, 600, 800)
+image = Image.open(filename)
+aspect = image.size[1] / image.size[0]
+width = int(HEIGHT / aspect)
+
+ctx = animation.Context(width, HEIGHT, background=(1., 1., 1., 1.), fullscreen=False, title="score")    
+ctx.load_image(filename, 0, 0, ctx.width, ctx.height)
 
 def on_key_press(info):
     global quality
