@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
+import sys, os
 from PIL import Image
 from housepy import animation, config, log, util
 from random import random
@@ -45,7 +45,7 @@ if len(sys.argv) < 2:
     exit()
 filename = sys.argv[1]
 if len(sys.argv) > 2:
-    notes = util.load(sys.argv[2])
+    notes = util.load("scores/%s" % sys.argv[2])
 
 image = Image.open(filename)
 aspect = image.size[1] / image.size[0]
@@ -90,8 +90,12 @@ ctx.add_callback("mouse_drag", on_mouse_drag)
 
 def export():
     global notes
+    if not len(notes):
+        return
     notes.sort(key=lambda x: x.on)
-    fn = "%s_%s.pkl" % (filename.split('.')[0], util.timestamp())
+    fn = "scores/%s_%s.pkl" % (filename.split('.')[0], util.timestamp())    
+    if not os.path.isdir("scores"):
+        os.mkdir("scores")
     util.save(fn, notes)
     log.info("Saved %s" % fn)
 
