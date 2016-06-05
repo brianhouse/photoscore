@@ -21,17 +21,19 @@ class Note():
     def __init__(self, on, y, quality):
         self.on = on
         self.off = on + (5 / ctx.width)
-        self.quality = quality
-        self.velocity = 1.0
-        self.y = y        
+        self.y = y
+        self.velocity = (5 / ctx.height)
+        self.quality = quality                
 
-    def update(self, x):
-        if x > self.off:
+    def update(self, x, y):
+        if x > self.on + (5 / ctx.width):
             self.off = x
+        y -= self.y
+        if y > (5 / ctx.height) and y < (20 / ctx.height):
+            self.velocity = y
 
-    def hit(self, note):
+    def hit(self, x, y):
         return util.distance((x * ctx.width, y * ctx.height), (self.on * ctx.width, self.y * ctx.height)) < 3
-
 
 notes = []
 current_note = None
@@ -42,6 +44,8 @@ if len(sys.argv) < 2:
     print("[IMAGE FILENAME]")
     exit()
 filename = sys.argv[1]
+if len(sys.argv) > 2:
+    notes = util.load(sys.argv[2])
 
 image = Image.open(filename)
 aspect = image.size[1] / image.size[0]
@@ -56,6 +60,8 @@ def on_key_press(info):
     if key in characters:
         quality = key
         log.info("Quality is %s" % quality)
+    elif key == '－':
+        export()
 ctx.add_callback("key_press", on_key_press)
 
 def on_mouse_press(info):
@@ -79,17 +85,25 @@ ctx.add_callback("mouse_press", on_mouse_press)
 def on_mouse_drag(info):
     global current_note
     x, y, dx, dy, button, modifiers = info
-    current_note.update(x)
+    current_note.update(x, y)
 ctx.add_callback("mouse_drag", on_mouse_drag)
+
+def export():
+    global notes
+    notes.sort(key=lambda x: x.on)
+    fn = "%s_%s.pkl" % (filename.split('.')[0], util.timestamp())
+    util.save(fn, notes)
+    log.info("Saved %s" % fn)
 
 def draw():
     global notes, quality
     for note in notes:
         x1, x2, y, q = note.on, note.off, note.y, note.quality
         width = x2 - x1
+        height = note.velocity
         intensity = 1.0
         color = list(colors[characters.index(q) % len(colors)])
         color.append(intensity)
-        ctx.rect(x1 - (3 / ctx.width), y - (3 / ctx.height), width + (2 / ctx.width), 7 / ctx.height, (1., 1., 1., 1.))
-        ctx.rect(x1 - (2 / ctx.width), y - (2 / ctx.height), width, 5 / ctx.height, color)            
+        ctx.rect(x1 - (3 / ctx.width), y - (3 / ctx.height), width + (2 / ctx.width), height + (2 / ctx.height), (1., 1., 1., 1.))
+        ctx.rect(x1 - (2 / ctx.width), y - (2 / ctx.height), width, height, color)            
 ctx.start(draw)
