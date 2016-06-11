@@ -98,15 +98,15 @@ def calc_play():
         note.off /= duration
 
 def export():
-    calc_play()
     global notes, filename
     if not len(notes):
         return
+    calc_play()        
     notes.sort(key=lambda x: x.on)
     fn = "scores/%s_%s.score" % (filename.split('.')[0], util.timestamp())    
     if not os.path.isdir("scores"):
         os.mkdir("scores")
-    util.save(fn, notes)
+    util.save(fn, (notes, ledgers))
     log.info("Saved %s" % fn)
 
 def draw():
@@ -121,14 +121,14 @@ def draw():
         ctx.rect(note.x - (2 / ctx.width), note.y - (2 / ctx.height), note.dx, note.dy, color)            
 
 def main():
-    global filename, ctx, notes
+    global filename, ctx, notes, ledgers
 
     if len(sys.argv) < 2:
         print("[IMAGE FILENAME]")
         exit()
     filename = sys.argv[1]
     if len(sys.argv) > 2:
-        notes = util.load("scores/%s" % sys.argv[2])
+        notes, ledgers = util.load("scores/%s" % sys.argv[2])
 
     image = Image.open(filename)
     aspect = image.size[1] / image.size[0]
