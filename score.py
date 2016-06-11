@@ -15,7 +15,7 @@ colors = [  (0, 0, 1),
             (1, 1, 0)
             ]
 notes = []
-ledgers = []
+ledgers = [0]
 current_note = None
 quality = "1"
 filename = None
@@ -28,10 +28,10 @@ class Note():
         self.y = y                
         self.dx = 5 / ctx.width
         self.dy = 5 / ctx.height
-        # self.on = on
-        # self.off = on + (5 / ctx.width)
-        # self.velocity = (5 / ctx.height)
         self.quality = quality                
+        #
+        self.on = None
+        self.off = None
 
     def update(self, x, y):
         if x > self.x + (5 / ctx.width):
@@ -41,6 +41,15 @@ class Note():
 
     def hit(self, x, y):
         return util.distance((x * ctx.width, y * ctx.height), (self.x * ctx.width, self.y * ctx.height)) < 3
+
+    def calc_play(self):
+        l = 0        
+        while l < len(ledgers) and ledgers[l] < self.y:
+            l += 1
+        l -= 1
+        self.on = self.x + (len(ledgers) - l - 1)
+        self.off = self.on + self.dx
+
 
 def on_key_press(info):
     global quality
@@ -64,6 +73,7 @@ def on_mouse_press(info):
                     pass
     elif modifiers == 64:
         ledgers.append(y)
+        ledgers.sort()
         log.info("Add ledger %f" % y)
     else:
         note = Note(x, y, quality)
@@ -74,10 +84,21 @@ def on_mouse_press(info):
 def on_mouse_drag(info):
     global current_note
     x, y, dx, dy, button, modifiers = info
-    if current_note is not None:
+    if current_note is not None and x < ctx.width:
         current_note.update(x, y)
 
+def calc_play():
+    global notes
+    for note in notes:
+        note.calc_play()
+        # print(note.x, note.y, note.on, note.off)
+    duration = len(ledgers)
+    for note in notes:
+        note.on /= duration
+        note.off /= duration
+
 def export():
+    calc_play()
     global notes, filename
     if not len(notes):
         return
