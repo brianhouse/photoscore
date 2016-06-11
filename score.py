@@ -44,12 +44,40 @@ class Note():
         return util.distance((x * ctx.width, y * ctx.height), (self.x * ctx.width, self.y * ctx.height)) < 3
 
     def calc_play(self):
+
+        # find ledger index
         l = 0        
         while l < len(ledgers) and ledgers[l] < self.y:
             l += 1
         l -= 1
-        self.on = self.x + (len(ledgers) - l - 1)
+        l = len(ledgers) - l - 1
+
+        # find column index
+        c = 0        
+        while c < len(columns) and columns[c] < self.x:
+            c += 1
+        c -= 1
+
+        # cell = (column * len(ledgers)) + ledger   # nope, not so siple
+        # print(cell)        
+
+        # start with relative position in cell    
+        self.on = self.x
+        self.on -= columns[c]
+
+        # add width of all previous columns                
+        for ci, x in enumerate(columns[:c]):
+            width = columns[ci + 1] - columns[ci] if ci < len(columns) - 1 else 1.0 - columns[ci]
+            self.on += width * len(ledgers)
+            # print("width %s: %s (* %s ledgers is %s)" % (ci, width, len(ledgers), width * len(ledgers)))
+
+        # add width of previous cells in this columns
+        width = columns[c + 1] - columns[c] if c < len(columns) - 1 else 1.0 - columns[c]
+        # print("width current (%s): %s (* %s ledgers is %s)" % (c, width, l, width * l))
+        self.on += width * l
         self.off = self.on + self.dx
+
+        # print()
 
 
 def on_key_press(info):
@@ -64,7 +92,6 @@ def on_key_press(info):
 def on_mouse_press(info):
     global notes, current_note
     x, y, button, modifiers = info
-    print(modifiers)
     if modifiers == 1:
         for note in notes:
             if note.hit(x, y):
@@ -97,11 +124,17 @@ def calc_play():
     global notes
     for note in notes:
         note.calc_play()
-        # print(note.x, note.y, note.on, note.off)
-    duration = len(ledgers)
+        # print(note.x, note.on)
+    # duration = len(ledgers) * len(columns)
+    # print()
+    duration = 0.0
+    for ci, x in enumerate(columns):
+        width = columns[ci + 1] - columns[ci] if ci < len(columns) - 1 else 1.0 - columns[ci]
+        duration += width * len(ledgers)
     for note in notes:
         note.on /= duration
         note.off /= duration
+        print(note.x, note.y, note.on, note.off)
 
 def export():
     global notes, filename
