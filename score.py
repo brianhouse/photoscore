@@ -15,6 +15,7 @@ colors = [  (0, 0, 1),
             (1, 1, 0)
             ]
 notes = []
+ledgers = []
 current_note = None
 quality = "1"
 filename = None
@@ -22,22 +23,24 @@ ctx = None
 
 class Note():
 
-    def __init__(self, on, y, quality):
-        self.on = on
-        self.off = on + (5 / ctx.width)
-        self.y = y
-        self.velocity = (5 / ctx.height)
+    def __init__(self, x, y, quality):
+        self.x = x
+        self.y = y                
+        self.dx = 5 / ctx.width
+        self.dy = 5 / ctx.height
+        # self.on = on
+        # self.off = on + (5 / ctx.width)
+        # self.velocity = (5 / ctx.height)
         self.quality = quality                
 
     def update(self, x, y):
-        if x > self.on + (5 / ctx.width):
-            self.off = x
-        y -= self.y
-        if y > (5 / ctx.height) and y < (20 / ctx.height):
-            self.velocity = y
+        if x > self.x + (5 / ctx.width):
+            self.dx = x - self.x
+        if y > self.y + (5 / ctx.height) and y < self.y + (20 / ctx.height):
+            self.dy = y - self.y
 
     def hit(self, x, y):
-        return util.distance((x * ctx.width, y * ctx.height), (self.on * ctx.width, self.y * ctx.height)) < 3
+        return util.distance((x * ctx.width, y * ctx.height), (self.x * ctx.width, self.y * ctx.height)) < 3
 
 def on_key_press(info):
     global quality
@@ -59,6 +62,9 @@ def on_mouse_press(info):
                     log.info("Removed note")
                 except ValueError:
                     pass
+    elif modifiers == 64:
+        ledgers.append(y)
+        log.info("Add ledger %f" % y)
     else:
         note = Note(x, y, quality)
         notes.append(note)
@@ -68,7 +74,8 @@ def on_mouse_press(info):
 def on_mouse_drag(info):
     global current_note
     x, y, dx, dy, button, modifiers = info
-    current_note.update(x, y)
+    if current_note is not None:
+        current_note.update(x, y)
 
 def export():
     global notes, filename
@@ -82,16 +89,15 @@ def export():
     log.info("Saved %s" % fn)
 
 def draw():
-    global notes, quality
+    global notes, ledgers
+    for ledger in ledgers:
+        ctx.line(0, ledger, 1, ledger, color=(0., 0., 0., 0.25), thickness=1.0)
     for note in notes:
-        x1, x2, y, q = note.on, note.off, note.y, note.quality
-        width = x2 - x1
-        height = note.velocity
         intensity = 1.0
-        color = list(colors[characters.index(q) % len(colors)])
+        color = list(colors[characters.index(note.quality) % len(colors)])
         color.append(intensity)
-        ctx.rect(x1 - (3 / ctx.width), y - (3 / ctx.height), width + (2 / ctx.width), height + (2 / ctx.height), (1., 1., 1., 1.))
-        ctx.rect(x1 - (2 / ctx.width), y - (2 / ctx.height), width, height, color)            
+        ctx.rect(note.x - (3 / ctx.width), note.y - (3 / ctx.height), note.dx + (2 / ctx.width), note.dy + (2 / ctx.height), (1., 1., 1., 1.))
+        ctx.rect(note.x - (2 / ctx.width), note.y - (2 / ctx.height), note.dx, note.dy, color)            
 
 def main():
     global filename, ctx, notes
