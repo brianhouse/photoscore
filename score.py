@@ -33,6 +33,9 @@ class Note():
         #
         self.on = None
         self.off = None
+        self.channel = None 
+        self.pitch = 1
+        self.velocity = None
 
     def update(self, x, y):
         if x > self.x + (5 / ctx.width):
@@ -77,6 +80,9 @@ class Note():
         self.on += width * l
         self.off = self.on + self.dx
 
+        self.channel = quality
+        self.pitch = 1        
+        self.velocity = self.dy / (20 / ctx.height)
         # print()
 
 
