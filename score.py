@@ -16,6 +16,7 @@ colors = [  (0, 0, 1),
             ]
 notes = []
 ledgers = [0]
+columns = [0]
 current_note = None
 quality = "1"
 filename = None
@@ -63,6 +64,7 @@ def on_key_press(info):
 def on_mouse_press(info):
     global notes, current_note
     x, y, button, modifiers = info
+    print(modifiers)
     if modifiers == 1:
         for note in notes:
             if note.hit(x, y):
@@ -75,6 +77,10 @@ def on_mouse_press(info):
         ledgers.append(y)
         ledgers.sort()
         log.info("Add ledger %f" % y)
+    elif modifiers == 132:
+        columns.append(x)
+        columns.sort()
+        log.info("Add column %f" % x)
     else:
         note = Note(x, y, quality)
         notes.append(note)
@@ -106,11 +112,13 @@ def export():
     fn = "scores/%s_%s.score" % (filename.split('.')[0], util.timestamp())    
     if not os.path.isdir("scores"):
         os.mkdir("scores")
-    util.save(fn, (notes, ledgers))
+    util.save(fn, (notes, ledgers, columns))
     log.info("Saved %s" % fn)
 
 def draw():
-    global notes, ledgers
+    global notes, ledgers, columns
+    for column in columns:
+        ctx.line(column, 0, column, 1, color=(0., 0., 0., 0.25), thickness=3.0)
     for ledger in ledgers:
         ctx.line(0, ledger, 1, ledger, color=(0., 0., 0., 0.25), thickness=1.0)
     for note in notes:
@@ -121,14 +129,14 @@ def draw():
         ctx.rect(note.x - (2 / ctx.width), note.y - (2 / ctx.height), note.dx, note.dy, color)            
 
 def main():
-    global filename, ctx, notes, ledgers
+    global filename, ctx, notes, ledgers, columns
 
     if len(sys.argv) < 2:
         print("[IMAGE FILENAME]")
         exit()
     filename = sys.argv[1]
     if len(sys.argv) > 2:
-        notes, ledgers = util.load("scores/%s" % sys.argv[2])
+        notes, ledgers, columns = util.load("scores/%s" % sys.argv[2])
 
     image = Image.open(filename)
     aspect = image.size[1] / image.size[0]

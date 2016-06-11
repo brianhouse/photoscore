@@ -7,7 +7,7 @@ from score import Note
 if len(sys.argv) < 2:
     print("[SCORE FILENAME]")
     exit()
-notes = util.load("scores/%s" % sys.argv[1])
+notes, ledgers, columns = util.load("scores/%s" % sys.argv[1])
 
 for note in notes:
     print(note.on)
