@@ -8,7 +8,7 @@
 			"architecture" : "x86"
 		}
 ,
-		"rect" : [ 204.0, 45.0, 1027.0, 570.0 ],
+		"rect" : [ 101.0, 45.0, 624.0, 570.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -29,27 +29,12 @@
 		"tags" : "",
 		"boxes" : [ 			{
 				"box" : 				{
-					"fontname" : "Arial",
-					"fontsize" : 12.0,
-					"id" : "obj-8",
-					"maxclass" : "newobj",
-					"numinlets" : 5,
-					"numoutlets" : 4,
-					"outlettype" : [ "signal", "signal", "", "" ],
-					"patching_rect" : [ 405.0, 60.0, 73.0, 20.0 ],
-					"text" : "adsr~"
-				}
-
-			}
-, 			{
-				"box" : 				{
 					"id" : "obj-7",
 					"maxclass" : "button",
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "bang" ],
-					"patching_rect" : [ 346.0, 270.0, 20.0, 20.0 ],
-					"presentation_rect" : [ 343.0, 270.0, 0.0, 0.0 ]
+					"patching_rect" : [ 346.0, 270.0, 20.0, 20.0 ]
 				}
 
 			}
@@ -60,8 +45,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "bang" ],
-					"patching_rect" : [ 285.0, 270.0, 20.0, 20.0 ],
-					"presentation_rect" : [ 279.0, 270.0, 0.0, 0.0 ]
+					"patching_rect" : [ 285.0, 270.0, 20.0, 20.0 ]
 				}
 
 			}
@@ -72,8 +56,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "bang" ],
-					"patching_rect" : [ 226.0, 270.0, 20.0, 20.0 ],
-					"presentation_rect" : [ 223.0, 270.0, 0.0, 0.0 ]
+					"patching_rect" : [ 226.0, 270.0, 20.0, 20.0 ]
 				}
 
 			}
@@ -116,20 +99,6 @@
 					"outlettype" : [ "signal" ],
 					"patching_rect" : [ 210.0, 300.0, 52.0, 20.0 ],
 					"text" : "subplay"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"fontname" : "Arial",
-					"fontsize" : 12.0,
-					"id" : "obj-59",
-					"maxclass" : "message",
-					"numinlets" : 2,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 75.0, 285.0, 50.0, 18.0 ],
-					"text" : "1 79"
 				}
 
 			}
@@ -394,15 +363,6 @@
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-21", 1 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-59", 1 ],
-					"disabled" : 0,
-					"hidden" : 0,
-					"source" : [ "obj-21", 0 ]
 				}
 
 			}
