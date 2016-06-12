@@ -139,7 +139,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 300.0, 135.0, 150.0, 20.0 ],
+					"patching_rect" : [ 255.0, 135.0, 150.0, 20.0 ],
 					"text" : "channels"
 				}
 

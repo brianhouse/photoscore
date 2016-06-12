@@ -21,6 +21,8 @@ current_note = None
 quality = "1"
 filename = None
 ctx = None
+player = None
+
 
 class Note():
 
@@ -94,6 +96,7 @@ def on_key_press(info):
         log.info("Quality is %s" % quality)
     elif key == '－':
         export()
+        player.play(notes)
 
 def on_mouse_press(info):
     global notes, current_note
@@ -168,7 +171,7 @@ def draw():
         ctx.rect(note.x - (2 / ctx.width), note.y - (2 / ctx.height), note.dx, note.dy, color)            
 
 def main():
-    global filename, ctx, notes, ledgers, columns
+    global filename, ctx, notes, ledgers, columns, player
 
     if len(sys.argv) < 2:
         print("[IMAGE FILENAME]")
@@ -176,6 +179,10 @@ def main():
     filename = sys.argv[1]
     if len(sys.argv) > 2:
         notes, ledgers, columns = util.load("scores/%s" % sys.argv[2])
+        print(len(notes))
+
+    from play import Player
+    player = Player()    
 
     image = Image.open(filename)
     aspect = image.size[1] / image.size[0]
