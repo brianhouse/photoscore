@@ -82,9 +82,10 @@ class Note():
         self.on += width * l
         self.off = self.on + self.dx
 
-        self.channel = quality
-        self.pitch = 1        
+        self.channel = {'t': 1, 'f': 2, 'l': 3}[self.quality]         ## hack
+        self.pitch = 1 
         self.velocity = self.dy / (20 / ctx.height)
+        print(self.channel)
         # print()
 
 
